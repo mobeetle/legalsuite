@@ -19,6 +19,8 @@ contents:
     dst: /usr/share/legalsuite/commands
   - src: ./scripts
     dst: /usr/share/legalsuite/scripts
+  - src: ./evals
+    dst: /usr/share/legalsuite/evals
   - src: ./playbooks
     dst: /usr/share/legalsuite/playbooks
   - src: ./LICENSE

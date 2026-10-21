@@ -94,14 +94,37 @@ MAX_COMPATIBILITY_LENGTH = 500
 # that merely contains a bracket is fine.
 FLOW_RE = re.compile(r"^\s*[\w.-]+:\s*[\[{]", re.M)
 TAG_RE = re.compile(r"^\s*[\w.-]+:\s*[&*!]", re.M)
+# Strict YAML: a key is `name:` followed by a space or the end of the line.
+KEY_RE = re.compile(r"^([A-Za-z0-9_.\-]+):(?: (.*))?$")
 
 
-def frontmatter(path: Path) -> tuple[dict, str]:
+def _yaml_scalar(path: Path, key: str, val: str) -> str:
+    """A scalar as strict YAML reads it; raises on the shapes strict YAML rejects.
+
+    The reference validator (`skills-ref`) parses with strictyaml, so a value the
+    repo gate accepts but strict YAML rejects is a skill that is broken for
+    every host and only fails in CI.
+    """
+    if val[:1] in ('"', "'"):
+        quote = val[0]
+        assert len(val) >= 2 and val.endswith(quote) and quote not in val[1:-1], \
+            f"{path}: {key}: malformed quoted scalar"
+        return val[1:-1]
+    assert not val.startswith("- "), f"{path}: {key}: value starts a YAML sequence"
+    assert ": " not in val, f"{path}: {key}: value contains ': ' (mapping values are not allowed here)"
+    assert not val.endswith(":"), f"{path}: {key}: value ends with ':' (mapping values are not allowed here)"
+    return val
+
+
+def frontmatter(path: Path, strict: bool = False) -> tuple[dict, str]:
     """Frontmatter as a dict. A nested block (e.g. `metadata:`) becomes a dict
     under its own key; every other key is a flat string.
 
     The parser is strict: a tab, a duplicate key, an indented line outside a
     block or a malformed line fails here rather than sliding through.
+    `strict=True` adds the strict-YAML scalar rules (the ones the Agent Skills
+    spec's parser applies). It is used for skill frontmatter — the format the
+    spec governs. The suite's own data packs keep the lenient line format.
     """
     text = path.read_text(encoding="utf-8")
     m = FM_RE.match(text)
@@ -116,29 +139,42 @@ def frontmatter(path: Path) -> tuple[dict, str]:
     for line in block.splitlines():
         if not line.strip():
             continue
-        if line[:1] in " \t":
-            assert parent is not None, f"{path}: indented line outside a block: {line.strip()!r}"
-            k, sep, v = line.strip().partition(":")
-            assert sep, f"{path}: malformed nested line: {line.strip()!r}"
-            key = k.strip()
+        indented = line[:1] in " \t"
+        raw = line.strip() if indented else line
+        if strict:
+            km = KEY_RE.match(raw)
+            assert km, f"{path}: malformed frontmatter line: {raw!r}"
+            key, val = km.group(1), km.group(2)
+        else:
+            k, sep, v = raw.partition(":")
+            assert sep, f"{path}: malformed frontmatter line: {raw!r}"
+            key, val = k.strip(), v.strip()
+        if indented:
+            assert parent is not None, f"{path}: indented line outside a block: {raw!r}"
             assert key not in seen_nested, f"{path}: duplicate key {key!r} in {parent_key}"
             seen_nested.append(key)
-            parent[key] = v.strip().strip('"')
+            parent[key] = _yaml_scalar(path, key, val) if strict else val.strip('"')
             continue
-        k, sep, v = line.partition(":")
-        assert sep, f"{path}: malformed frontmatter line: {line.strip()!r}"
-        key = k.strip()
         assert key not in seen_top, f"{path}: duplicate frontmatter key {key!r}"
         seen_top.append(key)
-        val = v.strip()
-        if val == "":                                  # a parent block, e.g. `metadata:`
-            parent_key = key
-            meta[key] = {}
-            parent = meta[key]
-            seen_nested = []
+        if strict:
+            if val is None:                                # a parent block, e.g. `metadata:`
+                parent_key = key
+                meta[key] = {}
+                parent = meta[key]
+                seen_nested = []
+            else:
+                parent = None
+                meta[key] = _yaml_scalar(path, key, val)
         else:
-            parent = None
-            meta[key] = val.strip('"')
+            if val == "":                                  # a parent block, e.g. `metadata:`
+                parent_key = key
+                meta[key] = {}
+                parent = meta[key]
+                seen_nested = []
+            else:
+                parent = None
+                meta[key] = val.strip('"')
     return meta, text[m.end():]
 
 
@@ -196,7 +232,7 @@ def check_skills() -> set[str]:
     scripts |= {p.name for p in (ENGINE / "scripts").glob("*.js")}
     for d in sorted(p for p in SKILLS.iterdir() if p.is_dir()):
         path = d / "SKILL.md"
-        meta, body = frontmatter(path)
+        meta, body = frontmatter(path, strict=True)
         name = meta.get("name", "")
         assert name == d.name, f"name {name!r} != folder {d.name!r}"
         assert NAME_RE.match(name) and len(name) <= 64, f"bad name {name!r}"
@@ -240,7 +276,7 @@ def check_capabilities() -> None:
             f"capability text {sig!r} must live only in skills/legal/{owner}; found {hits}"
     modes = sorted({m for pat in MODE_GLOBS for m in SKILLS.glob(pat)})
     for m in modes:
-        meta, body = frontmatter(m)
+        meta, body = frontmatter(m, strict=True)
         raw = FM_RE.match(m.read_text(encoding="utf-8")).group(1)
         check_frontmatter_shape(m, meta, raw, need_description=False, need_license=False)
         for k in ("version", "last_validated", "category"):
@@ -387,10 +423,85 @@ def check_evals() -> None:
         print(f"{'✓' if r.returncode == 0 else '…'} {label}: {tail}")
 
 
+def check_spec_reference() -> None:
+    """The Agent Skills spec, checked by the reference validator.
+
+    `skills-ref` (package `skills-ref`, console script `agentskills`) is the
+    oracle: the inline shape check is the approximation that runs everywhere,
+    this is the authority. When the library is installed the gate is exactly as
+    strict as the spec; when it is not, the check is reported as skipped and is
+    never counted as a pass.
+
+    The differential battery below is what keeps the approximation honest: for
+    every shape strict YAML refuses, the inline check must refuse it too. A
+    divergence in that direction is a skill that is broken for every host and
+    only fails in CI.
+    """
+    try:
+        from skills_ref.validator import validate as ref_validate
+    except ImportError:
+        print("… Spec (reference validator): skipped — skills-ref not installed")
+        return
+    dirs = sorted(p for p in SKILLS.iterdir() if p.is_dir())
+    rejected = {p.name: ref_validate(p) for p in dirs}
+    rejected = {k: v for k, v in rejected.items() if v}
+    assert not rejected, f"reference validator rejected: {rejected}"
+    print(f"✓ Spec: {len(dirs)} skills valid (reference validator)")
+
+    # Differential: the inline check must never accept what the oracle rejects.
+    base = ("name: parity-probe\n"
+            "description: \"A probe skill for the differential test.\"\n"
+            "license: Apache-2.0\n"
+            "metadata:\n"
+            "  imports: frame\n"
+            "  delta: probe\n"
+            "  version: 1.0\n"
+            "  last_validated: 2026-10-21\n"
+            "  category: mode\n")
+    cases = {
+        "unquoted value with ': '": base.replace('description: "A probe skill for the differential test."',
+                                                  "description: A probe: skill"),
+        "value starting with '- '": base.replace('description: "A probe skill for the differential test."',
+                                                  "description: - A probe skill"),
+        "value ending with ':'": base.replace('description: "A probe skill for the differential test."',
+                                               "description: A probe skill:"),
+        "key without a space": base.replace('description: "A probe skill for the differential test."',
+                                             "description:A probe skill"),
+        "tab-indented line": base.replace("  imports: frame", "\timports: frame"),
+        "duplicate key": base.replace("license: Apache-2.0", "license: Apache-2.0\nlicense: MIT"),
+        "flow collection": base.replace("  imports: frame", "  imports: [frame, gate]"),
+        "anchor token": base.replace("  delta: probe", "  delta: &x probe"),
+        "dotted top-level key": base.replace("metadata:", "metadata.imports: frame\nmetadata:"),
+        "unquoted value with '# '": base.replace('description: "A probe skill for the differential test."',
+                                                  "description: A probe skill # comment"),
+    }
+    import tempfile
+    dangerous = []
+    for label, text in cases.items():
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "parity-probe"
+            d.mkdir()
+            (d / "SKILL.md").write_text(f"---\n{text}---\n\n# parity probe\n", encoding="utf-8")
+            oracle = bool(ref_validate(d))
+            try:
+                meta, _ = frontmatter(d / "SKILL.md", strict=True)
+                block = FM_RE.match((d / "SKILL.md").read_text(encoding="utf-8")).group(1)
+                check_frontmatter_shape(d / "SKILL.md", meta, block,
+                                        need_description=True, need_license=True)
+                inline = False
+            except AssertionError:
+                inline = True
+            if oracle and not inline:
+                dangerous.append(label)
+    assert not dangerous, (f"inline check accepts what the reference validator rejects: {dangerous}")
+    print(f"✓ Spec parity: {len(cases)} strict-YAML shapes refused by both")
+
+
 def main() -> int:
     print("Running legalsuite integrity verification...")
     names = check_skills()
     check_capabilities()
+    check_spec_reference()
     check_neutral()
     check_commands(names)
     check_schema()

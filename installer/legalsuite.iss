@@ -20,9 +20,10 @@ WizardStyle=modern
 Source: "..\skills\*"; DestDir: "{app}\skills"; Flags: recursesubdirs
 Source: "..\commands\*"; DestDir: "{app}\commands"; Flags: recursesubdirs
 Source: "..\scripts\*"; DestDir: "{app}\scripts"; Flags: recursesubdirs
-Source: "..\playbooks\README.md"; DestDir: "{app}\playbooks"
-Source: "..\playbooks\_template.md"; DestDir: "{app}\playbooks"
-Source: "..\playbooks\_template-intake-matrix.md"; DestDir: "{app}\playbooks"
+Source: "..\evals\*"; DestDir: "{app}\evals"; Flags: recursesubdirs
+Source: "..\playbooks\*"; DestDir: "{app}\playbooks"; Flags: recursesubdirs
+Source: "..\LICENSE"; DestDir: "{app}"
+Source: "..\NOTICE"; DestDir: "{app}"
 Source: "..\install.ps1"; DestDir: "{app}"
 Source: "..\install.sh"; DestDir: "{app}"
 

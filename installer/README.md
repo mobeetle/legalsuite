@@ -7,11 +7,12 @@
 #
 # The wrappers below call the bootstraps so every path installs the same tree:
 #
-#   Linux (.deb/.rpm, one YAML):  npx? no — `nfpm package --config installer/nfpm.yaml`
+#   Linux (.deb/.rpm, one YAML):  `nfpm package --config installer/nfpm.yaml`
 #     needs: go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
-#     output: dist/legalsuite_2.0.0_amd64.deb + .rpm (skills+commands+scripts,
-#     postinstall prints the install.sh hint; no daemons, no root files outside
-#     /usr/share/legalsuite + a /usr/bin/legalsuite-install symlink).
+#     output: dist/legalsuite_2.0.0_amd64.deb + .rpm (skills+commands+scripts+
+#     evals+playbooks+LICENSE+NOTICE, postinstall prints the install.sh hint; no
+#     daemons, no root files outside /usr/share/legalsuite + a
+#     /usr/bin/legalsuite-install symlink).
 #
 #   Windows (Inno Setup 6, unsigned .exe):
 #     needs: Inno Setup 6 (iscc) on Windows.
@@ -25,8 +26,15 @@
 #     unsigned pkgs — right-click Open / `sudo installer -pkg`. Signing later:
 #     Developer-ID Installer cert + `productsign`, then `notarytool submit`.
 #
-#   Homebrew (no cert needed): `brew install --HEAD` from installer/homebrew/
-#     or tap legalskills/legalsuite. Formula just clones + runs install.sh.
+#   Homebrew (no cert needed): the formula in installer/homebrew/legalsuite.rb
+#     installs the published tarball (which archives under a `legalsuite/`
+#     root) and runs install.sh. It has a `url`, not a `head` block, so
+#     `brew install --HEAD` does not apply.
+#
+# Every layout ships the same tree: skills, commands, scripts, evals, playbooks,
+# LICENSE and NOTICE. The installer runs the suite's own gate before it
+# installs, so a layout missing any of them fails loudly instead of installing
+# a broken suite.
 #
 # Signing (when you have certs — not now):
 #   Windows: signtool sign /a /t http://timestamp.digicert.com dist/*.exe

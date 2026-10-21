@@ -97,9 +97,12 @@ is the oracle (`pip install skills-ref`), one directory at a time:
 for d in skills/*/; do agentskills validate "$d"; done
 ```
 
-`scripts/verify_suite.py` enforces the same rules inline — closed field set, a
-licence, strict-YAML-safe frontmatter — so the suite holds without the
-dependency. The CI workflow runs both.
+`scripts/verify_suite.py` enforces the repo's own shape inline — closed field
+set, a licence, strict-YAML-safe frontmatter — so the suite holds without the
+dependency, and it runs the reference validator too when it is installed
+(`✓ Spec: 6 skills valid (reference validator)`). The reference validator is
+the authority; the inline check is the approximation that runs everywhere. The
+CI workflow installs the library and runs both.
 
 
 ## Bundle shape

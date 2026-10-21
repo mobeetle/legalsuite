@@ -27,11 +27,11 @@ def run(*args) -> subprocess.CompletedProcess:
 
 def main() -> int:
     if not CORPUS.is_dir():
-        print(f"corpus check: 77 skipped (no {CORPUS})")
+        print(f"corpus check: skipped (no {CORPUS})")
         return 77   # a skip is not a pass
     matters = sorted(d for d in CORPUS.iterdir() if (d / "state.json").is_file())
     if not matters:
-        print(f"corpus check: 77 skipped (no matters in {CORPUS})")
+        print(f"corpus check: skipped (no matters in {CORPUS})")
         return 77
 
     failed = legacy = 0

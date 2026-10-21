@@ -9,11 +9,8 @@ HERE="$(cd "$(dirname "$0")/../.." && pwd)"
 STAGE="$(mktemp -d)"; trap 'rm -rf "$STAGE"' EXIT
 ROOT="$STAGE/root/usr/local/legalsuite"
 mkdir -p "$ROOT"
-for d in skills commands scripts; do cp -R "$HERE/$d" "$ROOT/"; done
-# Open playbooks only: the commercial packs (nda-*, saas-*, it-sow-*, nis2-*) never ship.
-mkdir -p "$ROOT/playbooks"
-for f in README.md _template.md _template-intake-matrix.md; do cp "$HERE/playbooks/$f" "$ROOT/playbooks/"; done
-cp "$HERE/install.sh" "$ROOT/"
+for d in skills commands scripts evals playbooks; do cp -R "$HERE/$d" "$ROOT/"; done
+cp "$HERE/LICENSE" "$HERE/NOTICE" "$HERE/install.sh" "$ROOT/"
 mkdir -p "$HERE/dist"
 PKG="$HERE/dist/legalsuite-$VER.pkg"
 pkgbuild --root "$STAGE/root" --identifier cz.legalskills.legalsuite \

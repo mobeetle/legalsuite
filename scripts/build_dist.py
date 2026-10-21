@@ -85,6 +85,7 @@ REQUIRED = (
     "legalsuite/playbooks/_template.md",
     "legalsuite/playbooks/_template-intake-matrix.md",
     "legalsuite/playbooks/nda-recipient-cz.md",
+    "legalsuite/skills/legal/scripts/fixtures/gsi-rev2-terms.md",
     "legalsuite/evals/run.py",
 )
 

@@ -8,8 +8,11 @@ class Legalsuite < Formula
   depends_on "node@20" => :optional
 
   def install
-    libexec.install Dir["skills", "commands", "scripts", "install.sh", "playbooks",
-                        "LICENSE", "NOTICE"]
+    # The published tarball archives under a `legalsuite/` root.
+    root = "legalsuite"
+    libexec.install Dir["#{root}/skills", "#{root}/commands", "#{root}/scripts",
+                        "#{root}/evals", "#{root}/playbooks",
+                        "#{root}/install.sh", "#{root}/LICENSE", "#{root}/NOTICE"]
     bin.write_exec_script libexec/"install.sh"
   end
 
