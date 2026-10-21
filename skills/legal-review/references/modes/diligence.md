@@ -11,7 +11,7 @@ metadata:
 # diligence (legal-review · mode)
 
 **Object of work.** A data room or a target, buy- or sell-side.
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 
 The Diligence hat. The object of work is **a target, seen through its

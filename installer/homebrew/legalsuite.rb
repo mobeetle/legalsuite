@@ -8,10 +8,8 @@ class Legalsuite < Formula
   depends_on "node@20" => :optional
 
   def install
-    libexec.install Dir["skills", "commands", "scripts", "install.sh"]
-    # Open playbooks only; the commercial packs are not in the formula's source.
-    (libexec/"playbooks").install "playbooks/README.md", "playbooks/_template.md",
-                                  "playbooks/_template-intake-matrix.md"
+    libexec.install Dir["skills", "commands", "scripts", "install.sh", "playbooks",
+                        "LICENSE", "NOTICE"]
     bin.write_exec_script libexec/"install.sh"
   end
 

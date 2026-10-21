@@ -11,7 +11,7 @@ metadata:
 # debrief (legal-project · mode)
 
 **Object of work.** The retrospective record of a closed matter.
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 
 The Debrief hat. The object of work is **a matter that has ended**. It is the

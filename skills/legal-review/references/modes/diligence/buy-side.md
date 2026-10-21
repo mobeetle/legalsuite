@@ -11,7 +11,7 @@ metadata:
 # Buy-side outputs
 
 **Object of work.** The buy-side diligence outputs (red-flag report, protections map, Q&A).
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 
 ## Red-flag report (`dd-report.md`)

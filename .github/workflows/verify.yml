@@ -1,0 +1,30 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: suite integrity gate
+        run: python3 scripts/verify_suite.py
+      - name: bundle builds and carries its licence
+        run: python3 scripts/build_dist.py
+      - name: agent skills spec (reference validator)
+        run: |
+          python3 -m pip install --quiet skills-ref
+          for d in skills/*/; do agentskills validate "$d"; done
+      - name: the bundle's own gate passes in the unpacked archive
+        run: |
+          mkdir -p /tmp/unpacked
+          tar xzf dist/legalsuite.tar.gz -C /tmp/unpacked
+          cd /tmp/unpacked/legalsuite && python3 scripts/verify_suite.py

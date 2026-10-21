@@ -10,7 +10,7 @@ metadata:
 
 # explain — client explanation (E4)
 
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 **Object of work.** Turn an **approved** memo or advice into plain language for a
 named recipient. The source is the approved text, never your own analysis: this

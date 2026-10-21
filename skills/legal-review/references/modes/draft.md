@@ -11,7 +11,7 @@ metadata:
 # draft (legal-review · mode)
 
 **Object of work.** One document's text: new text or a revision, precedent first.
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 
 The Drafting hat: **DRAFTING** (new text) and **REVISION** (text changed from

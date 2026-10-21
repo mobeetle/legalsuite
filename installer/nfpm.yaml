@@ -11,7 +11,7 @@ maintainer: legalskills.cz
 description: Legal skill suite (plaintext skills + Python/Node scripts + commands).
 vendor: legalskills.cz
 homepage: https://legalskills.cz
-license: Proprietary
+license: Apache-2.0
 contents:
   - src: ./skills
     dst: /usr/share/legalsuite/skills
@@ -19,12 +19,12 @@ contents:
     dst: /usr/share/legalsuite/commands
   - src: ./scripts
     dst: /usr/share/legalsuite/scripts
-  - src: ./playbooks/README.md
-    dst: /usr/share/legalsuite/playbooks/README.md
-  - src: ./playbooks/_template.md
-    dst: /usr/share/legalsuite/playbooks/_template.md
-  - src: ./playbooks/_template-intake-matrix.md
-    dst: /usr/share/legalsuite/playbooks/_template-intake-matrix.md
+  - src: ./playbooks
+    dst: /usr/share/legalsuite/playbooks
+  - src: ./LICENSE
+    dst: /usr/share/legalsuite/LICENSE
+  - src: ./NOTICE
+    dst: /usr/share/legalsuite/NOTICE
   - src: ./install.sh
     dst: /usr/share/legalsuite/install.sh
   - src: ./installer/legalsuite-install.sh

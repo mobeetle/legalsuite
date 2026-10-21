@@ -13,7 +13,7 @@ metadata:
 # legal-dispute
 
 **Object of work.** A claim, defence, pre-action demand, proceeding or internal investigation.
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 The Disputes hat. Litigation differs from transactional work in exactly the
 ways a document map doesn't capture: an adversary acting in real time, hard

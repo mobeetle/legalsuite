@@ -13,7 +13,7 @@ metadata:
 # legal-research (alias: legal-ground)
 
 **Object of work.** A legal question grounded in retrieved, checked authority (alias `legal-ground`).
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 The internal grounding function. Other skills invoke these phases inline
 whenever a premise lacks authority — it is not a separate track the user

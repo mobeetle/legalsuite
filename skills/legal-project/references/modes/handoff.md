@@ -11,7 +11,7 @@ metadata:
 # handoff (legal-project · mode)
 
 **Object of work.** A live matter handed to the colleague taking it over.
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 
 The Handover hat. The object of work is **the matter as it stands now**, written

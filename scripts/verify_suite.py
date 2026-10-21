@@ -85,43 +85,99 @@ FM_RE = re.compile(r"^---\n(.*?)\n---\n", re.DOTALL)
 # The Agent Skills spec's closed field set (agentskills.io). Anything else in a
 # skill's frontmatter makes the reference validator reject the skill.
 SKILL_FIELDS = {"name", "description", "license", "allowed-tools", "metadata", "compatibility"}
-# Strict YAML forbids flow collections (`[a, b]`, `{a: b}`): the spec's parser
-# rejects them outright, so no frontmatter may use that style.
-FLOW_RE = re.compile(r"^\s*[\w-]+:\s*[\[{]", re.M)
+# The suite's own keys, carried inside the `metadata:` block.
+META_FIELDS = {"imports", "delta", "version", "last_validated", "category"}
+MAX_COMPATIBILITY_LENGTH = 500
+# Strict YAML forbids flow collections (`[a, b]`, `{a: b}`) and anchor/alias/tag
+# tokens: the spec's parser rejects them outright, so no frontmatter may use
+# that style. The value must *start* with the token, so a quoted description
+# that merely contains a bracket is fine.
+FLOW_RE = re.compile(r"^\s*[\w.-]+:\s*[\[{]", re.M)
+TAG_RE = re.compile(r"^\s*[\w.-]+:\s*[&*!]", re.M)
 
 
 def frontmatter(path: Path) -> tuple[dict, str]:
-    """Frontmatter as a flat dict. Nested block keys are prefixed `parent.key`.
+    """Frontmatter as a dict. A nested block (e.g. `metadata:`) becomes a dict
+    under its own key; every other key is a flat string.
 
-    The Agent Skills spec allows only a closed set of top-level fields, so the
-    suite's own keys (imports, delta, version, last_validated, category) live
-    under `metadata:` -- parsed here as `metadata.imports` and so on.
+    The parser is strict: a tab, a duplicate key, an indented line outside a
+    block or a malformed line fails here rather than sliding through.
     """
     text = path.read_text(encoding="utf-8")
     m = FM_RE.match(text)
     assert m, f"Missing frontmatter in {path}"
-    meta: dict[str, str] = {}
+    block = m.group(1)
+    assert "\t" not in block, f"{path}: tab in frontmatter (strict YAML forbids it)"
+    meta: dict = {}
     parent = None
-    for line in m.group(1).splitlines():
+    parent_key = ""
+    seen_top: list[str] = []
+    seen_nested: list[str] = []
+    for line in block.splitlines():
         if not line.strip():
             continue
-        if line[:1] in " \t":                       # nested under a parent key
-            if parent is None:
-                continue
+        if line[:1] in " \t":
+            assert parent is not None, f"{path}: indented line outside a block: {line.strip()!r}"
             k, sep, v = line.strip().partition(":")
-            if sep:
-                meta[f"{parent}.{k.strip()}"] = v.strip().strip('"')
+            assert sep, f"{path}: malformed nested line: {line.strip()!r}"
+            key = k.strip()
+            assert key not in seen_nested, f"{path}: duplicate key {key!r} in {parent_key}"
+            seen_nested.append(key)
+            parent[key] = v.strip().strip('"')
             continue
         k, sep, v = line.partition(":")
-        if not sep:
-            continue
-        key, val = k.strip(), v.strip()
-        if val == "":                               # a parent block, e.g. `metadata:`
-            parent = key
-            continue
-        parent = None
-        meta[key] = val.strip('"')
+        assert sep, f"{path}: malformed frontmatter line: {line.strip()!r}"
+        key = k.strip()
+        assert key not in seen_top, f"{path}: duplicate frontmatter key {key!r}"
+        seen_top.append(key)
+        val = v.strip()
+        if val == "":                                  # a parent block, e.g. `metadata:`
+            parent_key = key
+            meta[key] = {}
+            parent = meta[key]
+            seen_nested = []
+        else:
+            parent = None
+            meta[key] = val.strip('"')
     return meta, text[m.end():]
+
+
+def mval(meta: dict, dotted: str) -> str:
+    """A frontmatter value addressed as `parent.key` for a nested block."""
+    if "." in dotted:
+        parent, key = dotted.split(".", 1)
+        block = meta.get(parent)
+        return block.get(key, "") if isinstance(block, dict) else ""
+    val = meta.get(dotted)
+    return val if isinstance(val, str) else ""
+
+
+def check_frontmatter_shape(path: Path, meta: dict, block: str, *,
+                            need_description: bool, need_license: bool) -> None:
+    """The Agent Skills spec, enforced on the repo's own frontmatter.
+
+    The reference validator (`agentskills validate`, package `skills-ref`) is
+    the oracle; these are the same rules inlined so the gate holds without a
+    third-party dependency.
+    """
+    name = meta.get("name", "") or path.stem
+    top = set(meta)
+    extra = top - SKILL_FIELDS
+    assert not extra, f"{name}: fields not allowed by the Agent Skills spec: {sorted(extra)}"
+    assert not FLOW_RE.search(block), f"{name}: frontmatter uses a flow collection (strict YAML forbids it)"
+    assert not TAG_RE.search(block), f"{name}: frontmatter uses an anchor/alias/tag (strict YAML forbids it)"
+    meta_block = meta.get("metadata")
+    if isinstance(meta_block, dict):
+        bad = set(meta_block) - META_FIELDS
+        assert not bad, f"{name}: unknown metadata keys: {sorted(bad)}"
+    if need_description:
+        assert meta.get("description"), f"{name}: no description"
+        assert len(meta.get("description", "")) <= 1024, f"{name}: description over 1024 chars"
+    if need_license:
+        assert meta.get("license"), f"{name}: no license"
+    if "compatibility" in meta:
+        assert len(meta.get("compatibility", "")) <= MAX_COMPATIBILITY_LENGTH, \
+            f"{name}: compatibility over {MAX_COMPATIBILITY_LENGTH} chars"
 
 
 def section_body(body: str, heading: str) -> str:
@@ -144,16 +200,12 @@ def check_skills() -> set[str]:
         name = meta.get("name", "")
         assert name == d.name, f"name {name!r} != folder {d.name!r}"
         assert NAME_RE.match(name) and len(name) <= 64, f"bad name {name!r}"
-        assert 0 < len(meta.get("description", "")) <= 1024, f"{name}: description length"
-        # Spec conformance: closed field set, a licence, and strict-YAML-safe
-        # (no flow collections) frontmatter.
+        # Spec conformance: closed field set, a licence, strict-YAML-safe
+        # (no flow collections, no anchors) frontmatter.
         raw = FM_RE.match(path.read_text(encoding="utf-8")).group(1)
-        extra = {k for k in meta if "." not in k} - SKILL_FIELDS
-        assert not extra, f"{name}: fields not allowed by the Agent Skills spec: {sorted(extra)}"
-        assert meta.get("license"), f"{name}: no license"
-        assert not FLOW_RE.search(raw), f"{name}: frontmatter uses a flow collection (strict YAML forbids it)"
+        check_frontmatter_shape(path, meta, raw, need_description=True, need_license=True)
         for k in ("version", "last_validated", "category"):
-            assert meta.get(f"metadata.{k}"), f"{name}: metadata missing {k}"
+            assert mval(meta, f"metadata.{k}"), f"{name}: metadata missing {k}"
         for sec in ("## What this mode does not do", "## Counter-example"):
             assert sec in body, f"{name}: missing {sec!r} section"
             assert section_body(body, sec).strip(), f"{name}: {sec!r} section is a heading with no content"
@@ -189,11 +241,10 @@ def check_capabilities() -> None:
     modes = sorted({m for pat in MODE_GLOBS for m in SKILLS.glob(pat)})
     for m in modes:
         meta, body = frontmatter(m)
-        for k in ("version", "last_validated", "category"):
-            assert meta.get(f"metadata.{k}"), f"{m.relative_to(SKILLS)}: metadata missing {k}"
         raw = FM_RE.match(m.read_text(encoding="utf-8")).group(1)
-        assert not FLOW_RE.search(raw), \
-            f"{m.relative_to(SKILLS)}: frontmatter uses a flow collection (strict YAML forbids it)"
+        check_frontmatter_shape(m, meta, raw, need_description=False, need_license=False)
+        for k in ("version", "last_validated", "category"):
+            assert mval(meta, f"metadata.{k}"), f"{m.relative_to(SKILLS)}: metadata missing {k}"
         for sec in ("## What this mode does not do", "## Counter-example"):
             assert sec in body, f"{m.relative_to(SKILLS)}: missing {sec!r} section"
         if m.name != "legal/SKILL.md" and m != ENGINE / "SKILL.md":   # §1.4 contract for all doors & modes
@@ -201,7 +252,7 @@ def check_capabilities() -> None:
             if "## Fan-out" in body and "## Checks" in body:
                 assert body.index("## Checks") < body.index("## Fan-out"), \
                     f"{m.relative_to(SKILLS)}: ## Checks must precede ## Fan-out (§1.4)"
-        imp = meta.get("metadata.imports", "")
+        imp = mval(meta, "metadata.imports")
         used = {s.strip() for s in imp.split(",") if s.strip()}
         assert used, f"{m.relative_to(SKILLS)}: mode front-matter declares no imports:"
         unknown = used - have

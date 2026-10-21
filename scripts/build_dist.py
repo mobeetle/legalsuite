@@ -25,9 +25,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Directories and files never shipped in the archive.
+# Directories and files never shipped in the archive. `fixtures` ships with the
+# scripts: the script demos assert against it, and a bundle without it would
+# run those demos with the assertion silently skipped.
 SKIP_DIRS = {".git", ".idea", ".workflow", ".inspiration", ".venv",
-             "node_modules", "dist", "__pycache__", "fixtures"}
+             "node_modules", "dist", "__pycache__"}
 SKIP_FILES = {".DS_Store"}
 SKIP_SUFFIX = (".pyc",)
 

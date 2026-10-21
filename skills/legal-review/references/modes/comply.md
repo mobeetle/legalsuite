@@ -11,7 +11,7 @@ metadata:
 # comply (legal-review · mode)
 
 **Object of work.** A regulatory gap analysis: which regimes apply and what is missing.
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 
 The Compliance hat. The object of work is **an organisation measured against a

@@ -13,7 +13,7 @@ metadata:
 # legal-project (project · handoff · debrief)
 
 **Object of work.** Running, handing over or closing a matter.
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 The PM door. The object of work is a **process**: deliverables across documents,
 stages and skills. Decompose by **work item**, keep the registers, integrate.

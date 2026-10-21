@@ -13,7 +13,7 @@ metadata:
 # legal-intake (front door)
 
 **Object of work.** A lead becoming a matter: qualified, engaged, captured, opened — and routed to the door that does the work.
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 Read `../legal/SKILL.md` first if the `legal` engine isn't loaded. Fact map
 format: `../legal/references/fact-map.md`. Registers:

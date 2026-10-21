@@ -11,7 +11,7 @@ metadata:
 # Sell-side outputs
 
 **Object of work.** The sell-side readiness outputs (VDD, remediation, data room, disclosure, Q&A).
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 
 The seller's advantage is time: run the buyer's review on yourself first, and

@@ -11,7 +11,7 @@ metadata:
 # negotiate (legal-review · mode)
 
 **Object of work.** One markup turn: what the counterparty changed, what we accept, what we counter.
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 
 The Negotiation hat. The object of work is **one turn of a negotiation**: what

@@ -13,7 +13,7 @@ metadata:
 # legal-review (core substantive door)
 
 **Object of work.** Judgment on one document or assessment for one side, and the text work around it (review, draft, negotiate, diligence, comply, explain).
-> **Imports.** Obey the capability files named in the front-matter `imports:`; do not restate them. This file carries only the mode's delta.
+> **Imports.** Obey the capability files named in the front-matter `metadata.imports`; do not restate them. This file carries only the mode's delta.
 
 The core door: judgment on one document for one side; challenge, verify and fix are its phases. Also holds draft, negotiate, diligence and comply.
 

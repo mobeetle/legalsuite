@@ -87,11 +87,24 @@ inbound document, a fabricated authority, `shall`→`may` flips, negation flips,
 party swaps, release safety, an unrun check recorded as `pass`, and the
 negative cases where a clean document has to stay clean.
 
-The skills also validate against the Agent Skills spec — `agentskills validate
-skills/*` (reference library: `pip install skills-ref`).
+The corpus check needs the sibling `legalczech` corpus. Without it the check
+reports `skipped` — a skip is never counted as a pass, and the suite says so.
+
+The skills also validate against the Agent Skills spec — the reference library
+is the oracle (`pip install skills-ref`), one directory at a time:
+
+```sh
+for d in skills/*/; do agentskills validate "$d"; done
+```
+
+`scripts/verify_suite.py` enforces the same rules inline — closed field set, a
+licence, strict-YAML-safe frontmatter — so the suite holds without the
+dependency. The CI workflow runs both.
 
 
 ## Bundle shape
+
+The source tree:
 
 ```
 legalsuite/
@@ -145,12 +158,20 @@ legalsuite/
     _template.md
     _template-intake-matrix.md
     README.md
+    nda-recipient-cz.md nda-mutual-cz.md saas-customer-cz.md saas-provider-cz.md
+    it-sow-customer-cz.md nis2-significant-supplier-cz.md
+    example-nda-discloser-cz.md    # all seeds ship as status: draft
+  LICENSE              # Apache-2.0
+  NOTICE               # attribution, "not legal advice", Czech law
 ```
 
 `skills/*` maps to `<config>/skills/*`; `commands/*` maps to `<config>/commands/*`.
 The skills and commands are the whole distribution. The installer asks for a
 skill-name prefix (default `legal-`) and applies it on the fly; the source tree
 keeps the canonical `legal-` names.
+
+`DESIGN.md` lives in the source tree, not in the archive — it is the decisions
+ledger for the project, not something an installed suite needs.
 
 ### One bundle
 
