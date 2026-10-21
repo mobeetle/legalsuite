@@ -1,0 +1,14 @@
+{
+  "title": "Control: a well-formed contract reports no structural defect",
+  "kind": "mechanical",
+  "run": [
+    "structure.py",
+    "contract.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": true,
+    "fail_checks_exact": [],
+    "warn_checks_exact": []
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Substance: a negation flip (an added 'not' with no modal change)",
+  "kind": "mechanical",
+  "run": [
+    "substance.py",
+    "original.md",
+    "revised.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "flip_categories_exact": [
+      "negation"
+    ],
+    "dropped_categories_exact": []
+  }
+}

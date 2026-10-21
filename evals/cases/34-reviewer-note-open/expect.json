@@ -1,0 +1,20 @@
+{
+  "title": "Control: an open reviewer note prints the multi-line block, not the collapsed line",
+  "kind": "mechanical",
+  "json": false,
+  "run": [
+    "display.py",
+    "--emit",
+    "reviewer_note",
+    "--sources",
+    "3 verified",
+    "--before",
+    "cap uncapped"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "> **⚠️ Reviewer note**\n> - **Sources:**"
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+Buyer shall indemnify Seller.

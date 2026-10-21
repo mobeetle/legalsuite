@@ -1,0 +1,19 @@
+{
+  "title": "Outbound scan: privilege label, drafting note, trace ref and a personal path in a release draft",
+  "kind": "mechanical",
+  "run": [
+    "scan.py",
+    "outbound",
+    "outbound.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "fail_checks_exact": [
+      "internal-marker"
+    ],
+    "warn_checks_exact": [
+      "personal-path"
+    ]
+  }
+}

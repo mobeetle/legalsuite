@@ -1,0 +1,15 @@
+{
+  "title": "Control: a clean outbound release note raises no issue",
+  "kind": "mechanical",
+  "run": [
+    "scan.py",
+    "outbound",
+    "release.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": true,
+    "fail_checks_exact": [],
+    "warn_checks_exact": []
+  }
+}

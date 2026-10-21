@@ -1,0 +1,457 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LegalSuiteMatterState",
+  "description": "Standardized schema for .legal/<matter-slug>/state.json",
+  "type": "object",
+  "required": [
+    "matter",
+    "stance",
+    "gate_plan"
+  ],
+  "properties": {
+    "matter": {
+      "type": "string",
+      "description": "Unique matter slug or identifier"
+    },
+    "suite_version": {
+      "type": "string",
+      "description": "Suite version that last wrote this state; absent means pre-schema"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "stance": {
+      "type": "object",
+      "required": [
+        "mode",
+        "risk",
+        "path"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "intake",
+            "research",
+            "review",
+            "draft",
+            "negotiate",
+            "dispute",
+            "diligence",
+            "comply",
+            "explain",
+            "project",
+            "handoff",
+            "debrief",
+            "brainstorm",
+            "setup"
+          ]
+        },
+        "risk": {
+          "type": "string",
+          "enum": [
+            "low",
+            "analytical",
+            "high"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "enum": [
+            "fast-track",
+            "standard",
+            "architect"
+          ]
+        },
+        "jurisdiction": {
+          "type": "string"
+        },
+        "epoch": {
+          "type": "string"
+        },
+        "interests": {
+          "type": "string"
+        },
+        "posture": {
+          "type": "string"
+        },
+        "audience": {
+          "type": "string",
+          "enum": [
+            "lawyer",
+            "client",
+            "business",
+            "court",
+            "counterparty",
+            "regulator"
+          ]
+        },
+        "language": {
+          "type": "string"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fan_out": {
+          "type": "string",
+          "enum": [
+            "none",
+            "read",
+            "read+write"
+          ],
+          "description": "Subagent mix this run will spawn"
+        },
+        "playbook": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "slug@version"
+          }
+        }
+      }
+    },
+    "gate_plan": {
+      "type": "object",
+      "required": [
+        "current_gate",
+        "approved",
+        "checkpoints"
+      ],
+      "properties": {
+        "current_gate": {
+          "type": "string"
+        },
+        "approved": {
+          "type": "boolean"
+        },
+        "restated_request": {
+          "type": "string"
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "text",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "G1"
+              },
+              "text": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "satisfied",
+                  "compromised",
+                  "blocked"
+                ]
+              },
+              "evidence": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "success_criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "goal",
+              "text",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "C1"
+              },
+              "goal": {
+                "type": "string",
+                "example": "G1"
+              },
+              "text": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "satisfied",
+                  "compromised",
+                  "blocked"
+                ]
+              },
+              "evidence": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "checkpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "title",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "G0"
+              },
+              "title": {
+                "type": "string"
+              },
+              "phases": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "active",
+                  "passed",
+                  "skipped"
+                ]
+              },
+              "rationale": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "active_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "skill": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "todo",
+              "in_progress",
+              "review",
+              "done",
+              "deferred",
+              "blocked"
+            ]
+          },
+          "blocking": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "packets": {
+      "type": "array",
+      "description": "Mirror of packets/ and results/: one row per delegated packet",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "agent",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "P1"
+          },
+          "workstream": {
+            "type": "string"
+          },
+          "agent": {
+            "type": "string"
+          },
+          "rw": {
+            "type": "string",
+            "enum": [
+              "read-only",
+              "write"
+            ]
+          },
+          "scope": {
+            "type": "string"
+          },
+          "wave": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "returned",
+              "integrated",
+              "rejected"
+            ]
+          },
+          "result": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "deadlines": {
+      "type": "array",
+      "description": "Mirror of deadlines.md",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "what",
+          "rule",
+          "status",
+          "trigger",
+          "basis"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "T1"
+          },
+          "what": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "description": "Latest safe date (ISO), empty if the trigger is unknown"
+          },
+          "rule": {
+            "type": "string",
+            "description": "Computation rule; always present"
+          },
+          "basis": {
+            "type": "string",
+            "description": "Provenance tag, e.g. [AUTH:A1]"
+          },
+          "consequence": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "met",
+              "missed",
+              "n/a",
+              "superseded",
+              "unknown"
+            ]
+          },
+          "verified_by": {
+            "type": "string",
+            "description": "who re-derived the date"
+          },
+          "verified_at": {
+            "type": "string",
+            "description": "when it was re-derived (YYYY-MM-DD)"
+          }
+        }
+      }
+    },
+    "checks_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "result"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "artifact": {
+            "type": "string"
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "skipped",
+              "accepted"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "runs": {
+      "type": "array",
+      "description": "Mirror of runs.md: one row per architect run",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "date",
+          "skill"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "run-1"
+          },
+          "date": {
+            "type": "string"
+          },
+          "skill": {
+            "type": "string"
+          },
+          "gate": {
+            "type": "string",
+            "description": "Gate reached this run, e.g. G2"
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "checks": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

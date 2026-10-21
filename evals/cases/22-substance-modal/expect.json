@@ -1,0 +1,17 @@
+{
+  "title": "Substance: a modal flip (is obliged -> may)",
+  "kind": "mechanical",
+  "run": [
+    "substance.py",
+    "original.md",
+    "revised.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "flip_categories_exact": [
+      "modal"
+    ],
+    "dropped_categories_exact": []
+  }
+}

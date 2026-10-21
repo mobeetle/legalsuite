@@ -1,0 +1,20 @@
+{
+  "title": "Untracked shall->may, a dropped zero and a longer cure period in a 'clean' counterparty version",
+  "kind": "mechanical",
+  "run": [
+    "substance.py",
+    "ours-v2.md",
+    "theirs-v3-clean.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "flip_categories_exact": [
+      "modal"
+    ],
+    "dropped_categories_exact": [
+      "money",
+      "duration"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Inbound scan: an embedded instruction in an HTML comment plus a bidi override character",
+  "kind": "mechanical",
+  "run": [
+    "scan.py",
+    "inbound",
+    "inbound.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "fail_checks_exact": [
+      "injection",
+      "invisible-chars"
+    ],
+    "detail_contains_all": [
+      "AI reviewer"
+    ]
+  }
+}

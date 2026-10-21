@@ -1,0 +1,17 @@
+{
+  "title": "Fact-map views regenerate from facts.md alone (chronology, claims matrix, gaps)",
+  "kind": "mechanical",
+  "run": [
+    "views.py",
+    "--facts",
+    "facts.md",
+    "--json"
+  ],
+  "expect": {
+    "keys_nonempty": [
+      "chronology",
+      "claims",
+      "gaps"
+    ]
+  }
+}

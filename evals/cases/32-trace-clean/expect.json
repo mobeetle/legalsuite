@@ -1,0 +1,18 @@
+{
+  "title": "Control: a verified authority and an evidenced fact trace clean",
+  "kind": "mechanical",
+  "run": [
+    "trace.py",
+    "artifact.md",
+    "--facts",
+    "facts.md",
+    "--authorities",
+    "authorities.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": true,
+    "fail_checks_exact": [],
+    "warn_checks_exact": []
+  }
+}

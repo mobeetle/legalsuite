@@ -1,0 +1,17 @@
+{
+  "title": "Substance: a connector flip (and -> or) in an aligned sentence",
+  "kind": "mechanical",
+  "run": [
+    "substance.py",
+    "original.md",
+    "revised.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "flip_categories_exact": [
+      "connector"
+    ],
+    "dropped_categories_exact": []
+  }
+}

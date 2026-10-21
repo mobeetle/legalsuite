@@ -1,0 +1,20 @@
+{
+  "title": "A finding demoted below its upstream severity with no recorded reason",
+  "kind": "mechanical",
+  "run": [
+    "trace.py",
+    "demoted.md",
+    "--upstream",
+    "upstream.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "fail_checks_exact": [
+      "floor"
+    ],
+    "detail_contains_all": [
+      "without a recorded reason"
+    ]
+  }
+}

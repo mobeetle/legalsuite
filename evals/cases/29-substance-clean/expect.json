@@ -1,0 +1,15 @@
+{
+  "title": "Control: an unchanged text produces no flip and no drop",
+  "kind": "mechanical",
+  "run": [
+    "substance.py",
+    "doc.md",
+    "doc.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": true,
+    "flip_categories_exact": [],
+    "dropped_categories_exact": []
+  }
+}

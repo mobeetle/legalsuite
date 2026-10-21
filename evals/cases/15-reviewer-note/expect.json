@@ -1,0 +1,22 @@
+{
+  "title": "Reviewer note collapses to ONE line when clean",
+  "kind": "mechanical",
+  "json": false,
+  "run": [
+    "display.py",
+    "--emit",
+    "reviewer_note",
+    "--sources",
+    "3 verified",
+    "--clean"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "> **⚠️ Reviewer note:** 3 verified"
+    ],
+    "stdout_absent": [
+      "> - **Sources:**"
+    ]
+  }
+}

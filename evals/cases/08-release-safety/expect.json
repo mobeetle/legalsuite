@@ -1,0 +1,21 @@
+{
+  "title": "Counterparty issues list still carrying a privilege label, a ledger ref and a drafting note with our fallback",
+  "kind": "mechanical",
+  "run": [
+    "scan.py",
+    "outbound",
+    "issues-list.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "fail_checks_exact": [
+      "internal-marker"
+    ],
+    "detail_contains_all": [
+      "PRIVILEGED",
+      "[AUTH:A2]",
+      "Drafting note"
+    ]
+  }
+}

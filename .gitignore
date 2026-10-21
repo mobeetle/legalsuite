@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
+node_modules/
+dist/
+.idea/
+
+# Internal working material — not part of the published product.
+# `.inspiration/` holds third-party reference repos; `review/` holds the
+# internal review and business-strategy notes; `.workflow/` holds the
+# delivery run records. None of it ships (see scripts/build_dist.py SKIP_DIRS).
+.inspiration/
+review/
+.workflow/

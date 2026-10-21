@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "rule": "Every case is listed exactly once. Mechanical cases run here; model cases are skill runs graded against rubric.md. The runner fails on any unlisted case.",
+  "mechanical": [
+    "01-silent-change",
+    "02-prompt-injection",
+    "03-citation-trap",
+    "07-structure",
+    "08-release-safety",
+    "11-severity-floor",
+    "12-unrun-pass",
+    "13-no-positions-no-ratings",
+    "14-views",
+    "15-reviewer-note",
+    "18-severity-floor-reason",
+    "19-unrun-pass-recorded",
+    "20-tag-integrity",
+    "21-ref-resolution",
+    "22-substance-modal",
+    "23-substance-connector",
+    "24-substance-negation",
+    "25-substance-party",
+    "26-structure-cz",
+    "27-scan-inbound-bidi",
+    "28-scan-outbound-note",
+    "29-substance-clean",
+    "30-scan-inbound-clean",
+    "31-scan-outbound-clean",
+    "32-trace-clean",
+    "33-structure-clean",
+    "34-reviewer-note-open"
+  ],
+  "model": [
+    "04-nda-seeded-defects",
+    "05-severity-side",
+    "06-intake-time-bar",
+    "09-final-output",
+    "10-progress-box",
+    "16-wave4-e2e",
+    "17-authority-eval"
+  ]
+}

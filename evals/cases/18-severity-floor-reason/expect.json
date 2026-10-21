@@ -1,0 +1,16 @@
+{
+  "title": "A finding demoted below its upstream severity WITH an explicit reason (no floor breach)",
+  "kind": "mechanical",
+  "run": [
+    "trace.py",
+    "artifact.md",
+    "--upstream",
+    "upstream.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": true,
+    "fail_checks_exact": [],
+    "warn_checks_exact": []
+  }
+}

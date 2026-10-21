@@ -1,0 +1,17 @@
+{
+  "title": "A cited fact still carries an unverified [verify] flag in its Tag cell",
+  "kind": "mechanical",
+  "run": [
+    "trace.py",
+    "artifact.md",
+    "--facts",
+    "facts.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "fail_checks_exact": [
+      "tag"
+    ]
+  }
+}

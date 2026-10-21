@@ -1,0 +1,17 @@
+{
+  "title": "Ratings present with no playbook bound (no positions -> no ratings)",
+  "kind": "mechanical",
+  "run": [
+    "load_playbook.py",
+    "--bind",
+    "artifact.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "min_fails": 1,
+    "detail_contains_all": [
+      "no playbook is bound"
+    ]
+  }
+}

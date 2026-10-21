@@ -1,0 +1,27 @@
+{
+  "title": "Memo relies on two unverified authorities and a fact without evidence",
+  "kind": "mechanical",
+  "run": [
+    "trace.py",
+    "memo.md",
+    "--facts",
+    "facts.md",
+    "--authorities",
+    "authorities.md",
+    "--json"
+  ],
+  "expect": {
+    "ok": false,
+    "fail_checks_exact": [
+      "authority"
+    ],
+    "warn_checks_exact": [
+      "evidence"
+    ],
+    "detail_contains_all": [
+      "A1",
+      "A2",
+      "F1"
+    ]
+  }
+}
